@@ -130,7 +130,7 @@ if st.button("🚀 Generar Sesión en Word", type="primary"):
             try:
                 client = genai.Client(api_key=api_key)
                 resp = client.models.generate_content(
-                    model="gemini-2.0-flash",
+                    model="gemini-2.5-flash",
                     contents=f"Área: {area}, Grado: {grado}, Tema: {tema}, Duración: {duracion}",
                     config=types.GenerateContentConfig(system_instruction=SYSTEM_PROMPT, response_mime_type="application/json", temperature=0.2)
                 )
