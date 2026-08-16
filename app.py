@@ -130,8 +130,19 @@ if st.button("🚀 Generar Sesión en Word", type="primary"):
             try:
                 client = genai.Client(api_key=api_key)
                 
+                # Detectar automáticamente el modelo Gemini activo en tu API Key
+                modelo_activo = None
+                for m in client.models.list():
+                    if "gemini" in m.name and "embed" not in m.name and "imagen" not in m.name:
+                        modelo_activo = m.name
+                        break
+                
+                if not modelo_activo:
+                    st.error("No se encontró ningún modelo Gemini disponible para esta clave de API.")
+                    st.stop()
+
                 resp = client.models.generate_content(
-                    model="gemini-1.5-flash",
+                    model=modelo_activo,
                     contents=f"Área: {area}, Grado: {grado}, Tema: {tema}, Duración: {duracion}",
                     config=types.GenerateContentConfig(
                         system_instruction=SYSTEM_PROMPT,
