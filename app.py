@@ -129,11 +129,22 @@ if st.button("🚀 Generar Sesión en Word", type="primary"):
         with st.spinner("Creando sesión..."):
             try:
                 client = genai.Client(api_key=api_key)
-                resp = client.models.generate_content(
-                    model="gemini-2.5-pro",
-                    contents=f"Área: {area}, Grado: {grado}, Tema: {tema}, Duración: {duracion}",
-                    config=types.GenerateContentConfig(system_instruction=SYSTEM_PROMPT, response_mime_type="application/json", temperature=0.2)
-                )
+                
+                # Probar modelos disponibles automáticamente
+                modelos = ["gemini-2.5-flash", "gemini-2.5-pro", "gemini-2.0-flash"]
+                resp = None
+                
+                for mod in modelos:
+                    try:
+                        resp = client.models.generate_content(
+                            model=mod,
+                            contents=f"Área: {area}, Grado: {grado}, Tema: {tema}, Duración: {duracion}",
+                            config=types.GenerateContentConfig(system_instruction=SYSTEM_PROMPT, response_mime_type="application/json", temperature=0.2)
+                        )
+                        if resp:
+                            break
+                    except Exception:
+                        continue
                 docx_bytes = generar_documento_bytes(json.loads(resp.text))
                 st.success("¡Listo!")
                 st.download_button("📥 Descargar Word (.docx)", data=docx_bytes, file_name=f"Sesion_{area}_{grado}.docx")
