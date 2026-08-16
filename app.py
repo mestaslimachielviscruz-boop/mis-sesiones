@@ -130,24 +130,14 @@ if st.button("🚀 Generar Sesión en Word", type="primary"):
             try:
                 client = genai.Client(api_key=api_key)
                 
-                # Detectar automáticamente el modelo activo en tu cuenta
-                modelo_activo = None
-                try:
-                    for m in client.models.list():
-                        nombre = m.name.replace("models/", "")
-                        if "gemini" in nombre and "embed" not in nombre and "imagen" not in nombre:
-                            modelo_activo = nombre
-                            break
-                except Exception:
-                    pass
-
-                if not modelo_activo:
-                    modelo_activo = "gemini-2.5-flash"
-
                 resp = client.models.generate_content(
-                    model=modelo_activo,
+                    model="gemini-1.5-flash",
                     contents=f"Área: {area}, Grado: {grado}, Tema: {tema}, Duración: {duracion}",
-                    config=types.GenerateContentConfig(system_instruction=SYSTEM_PROMPT, response_mime_type="application/json", temperature=0.2)
+                    config=types.GenerateContentConfig(
+                        system_instruction=SYSTEM_PROMPT,
+                        response_mime_type="application/json",
+                        temperature=0.2
+                    )
                 )
 
                 if resp and resp.text:
@@ -155,6 +145,6 @@ if st.button("🚀 Generar Sesión en Word", type="primary"):
                     st.success("¡Listo!")
                     st.download_button("📥 Descargar Word (.docx)", data=docx_bytes, file_name=f"Sesion_{area}_{grado}.docx")
                 else:
-                    st.error("No se pudo obtener respuesta del modelo.")
+                    st.error("No se obtuvo respuesta del modelo.")
             except Exception as e:
-                st.error(f"Error: {e}")
+                st.error(f"Error al generar la sesión: {e}")
